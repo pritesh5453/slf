@@ -20,12 +20,13 @@ class _MenuSectionScreenState extends State<MenuSectionScreen>
 
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 280),
+      duration: const Duration(milliseconds: 2),
     );
 
+    // LEFT SIDE SLIDE
     _slideAnimation = Tween(
-      end: const Offset(1.0, 0.0),
-      begin: const Offset(0.0, 0.0),
+      begin: const Offset(-1.0, 0.0), // Slide from left
+      end: const Offset(0.0, 0.0),
     ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
 
     _controller.forward();
@@ -41,163 +42,169 @@ class _MenuSectionScreenState extends State<MenuSectionScreen>
   Widget build(BuildContext context) {
     final w = MediaQuery.of(context).size.width;
 
-    return Stack(
-      children: [
-        // ---------- BACKGROUND DIM ----------
-        GestureDetector(
-          onTap: () => Navigator.pop(context),
-          child: Container(color: Colors.black.withOpacity(0.30)),
-        ),
+    return SafeArea(
+      // 🔥 SafeArea added HERE
+      child: Stack(
+        children: [
+          // ---------- BACKGROUND LIGHT FADE ----------
+          GestureDetector(
+            onTap: () => Navigator.pop(context),
+            child: Container(
+              color: Colors.black.withOpacity(0.10), // light fade
+            ),
+          ),
 
-        // ---------- RIGHT SLIDING PANEL ----------
-        Align(
-          alignment: Alignment.centerRight,
-          child: SlideTransition(
-            position: _slideAnimation,
+          // ---------- LEFT SLIDING PANEL ----------
+          Align(
+            alignment: Alignment.centerLeft,
+            child: SlideTransition(
+              position: _slideAnimation,
 
-            // IMPORTANT: Material added here
-            child: Material(
-              elevation: 8,
-              color: Colors.white,
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(16),
-                bottomLeft: Radius.circular(16),
-              ),
+              child: Material(
+                elevation: 8,
+                color: Colors.white,
+                borderRadius: const BorderRadius.only(
+                  topRight: Radius.circular(16),
+                  bottomRight: Radius.circular(16),
+                ),
 
-              child: Container(
-                width: w * 0.82,
-                height: double.infinity,
-                child: SafeArea(
-                  child: Column(
-                    children: [
-                      // ---------------- HEADER ----------------
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 16,
-                        ),
-                        child: Row(
-                          children: [
-                            const CircleAvatar(
-                              radius: 22,
-                              backgroundImage: AssetImage(
-                                "assets/images/profile.png",
-                              ),
-                            ),
-                            const SizedBox(width: 10),
-                            const Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  "Pritesh Pawar",
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                                Text(
-                                  "ID : SLF-123512345",
-                                  style: TextStyle(
-                                    color: Colors.black54,
-                                    fontSize: 13,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const Spacer(),
-                            GestureDetector(
-                              onTap: () => Navigator.pop(context),
-                              child: const Icon(Icons.close, size: 26),
-                            ),
-                          ],
-                        ),
-                      ),
+                child: Container(
+                  width: w * 0.82,
+                  height: double.infinity,
 
-                      const Divider(height: 1),
-
-                      Expanded(
-                        child: SingleChildScrollView(
-                          child: Column(
+                  child: SafeArea(
+                    // Inner SafeArea remains
+                    child: Column(
+                      children: [
+                        // ---------------- HEADER ----------------
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 16,
+                          ),
+                          child: Row(
                             children: [
-                              // PERSONAL DETAILS
-                              _menuTile(
-                                title: "Personal Details",
-                                isSelected: selected == "personal",
-                                onTap: () {
-                                  setState(() {
-                                    selected = selected == "personal"
-                                        ? ""
-                                        : "personal";
-                                  });
-                                },
-                              ),
-                              if (selected == "personal")
-                                _personalDetailsCard(),
-
-                              // CONTACT US
-                              _menuTile(
-                                title: "Contact Us",
-                                isSelected: selected == "contact",
-                                onTap: () {
-                                  setState(() {
-                                    selected = selected == "contact"
-                                        ? ""
-                                        : "contact";
-                                  });
-                                },
-                              ),
-                              if (selected == "contact") _contactUsCard(),
-
-                              // SETTINGS
-                              _menuTile(
-                                title: "Settings",
-                                isSelected: selected == "settings",
-                                onTap: () {
-                                  setState(() {
-                                    selected = selected == "settings"
-                                        ? ""
-                                        : "settings";
-                                  });
-                                },
-                              ),
-                              if (selected == "settings") _settingsCard(),
-
-                              const SizedBox(height: 20),
-
-                              // LOG OUT BUTTON
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 20,
+                              const CircleAvatar(
+                                radius: 22,
+                                backgroundImage: AssetImage(
+                                  "assets/images/profile.png",
                                 ),
-                                child: Row(
-                                  children: const [
-                                    Icon(Icons.logout, color: Colors.red),
-                                    SizedBox(width: 10),
-                                    Text(
-                                      "Log Out",
-                                      style: TextStyle(
-                                        color: Colors.red,
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w600,
-                                      ),
+                              ),
+                              const SizedBox(width: 10),
+                              const Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    "Pritesh Pawar",
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
                                     ),
-                                  ],
-                                ),
+                                  ),
+                                  Text(
+                                    "ID : SLF-123512345",
+                                    style: TextStyle(
+                                      color: Colors.black54,
+                                      fontSize: 13,
+                                    ),
+                                  ),
+                                ],
                               ),
-
-                              const SizedBox(height: 40),
+                              const Spacer(),
+                              GestureDetector(
+                                onTap: () => Navigator.pop(context),
+                                child: const Icon(Icons.close, size: 26),
+                              ),
                             ],
                           ),
                         ),
-                      ),
-                    ],
+
+                        const Divider(height: 1),
+
+                        Expanded(
+                          child: SingleChildScrollView(
+                            child: Column(
+                              children: [
+                                // PERSONAL DETAILS
+                                _menuTile(
+                                  title: "Personal Details",
+                                  isSelected: selected == "personal",
+                                  onTap: () {
+                                    setState(() {
+                                      selected = selected == "personal"
+                                          ? ""
+                                          : "personal";
+                                    });
+                                  },
+                                ),
+                                if (selected == "personal")
+                                  _personalDetailsCard(),
+
+                                // CONTACT US
+                                _menuTile(
+                                  title: "Contact Us",
+                                  isSelected: selected == "contact",
+                                  onTap: () {
+                                    setState(() {
+                                      selected = selected == "contact"
+                                          ? ""
+                                          : "contact";
+                                    });
+                                  },
+                                ),
+                                if (selected == "contact") _contactUsCard(),
+
+                                // SETTINGS
+                                _menuTile(
+                                  title: "Settings",
+                                  isSelected: selected == "settings",
+                                  onTap: () {
+                                    setState(() {
+                                      selected = selected == "settings"
+                                          ? ""
+                                          : "settings";
+                                    });
+                                  },
+                                ),
+                                if (selected == "settings") _settingsCard(),
+
+                                const SizedBox(height: 20),
+
+                                // LOG OUT
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 20,
+                                  ),
+                                  child: Row(
+                                    children: const [
+                                      Icon(Icons.logout, color: Colors.red),
+                                      SizedBox(width: 10),
+                                      Text(
+                                        "Log Out",
+                                        style: TextStyle(
+                                          color: Colors.red,
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+
+                                const SizedBox(height: 40),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -228,21 +235,19 @@ class _MenuSectionScreenState extends State<MenuSectionScreen>
   }
 
   //--------------------------------------------------------
-  // PERSONAL DETAILS CARD
+  // CARDS
   //--------------------------------------------------------
   Widget _personalDetailsCard() {
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Column(
         children: [
-          _readonlyField("Pritesh Shailesh Pawar"),
+          _readonlyField("Pritesh Pawar"),
           _readonlyField("+91 9869311557"),
           _readonlyField("pritesh123@gmail.com"),
           _readonlyField("18 April 1999"),
           _readonlyField("Tidele Colony, Nashik"),
-
           const SizedBox(height: 10),
-
           Container(
             padding: const EdgeInsets.all(12),
             width: double.infinity,
@@ -260,9 +265,6 @@ class _MenuSectionScreenState extends State<MenuSectionScreen>
     );
   }
 
-  //--------------------------------------------------------
-  // CONTACT US CARD
-  //--------------------------------------------------------
   Widget _contactUsCard() {
     return Padding(
       padding: const EdgeInsets.all(16),
@@ -277,9 +279,6 @@ class _MenuSectionScreenState extends State<MenuSectionScreen>
     );
   }
 
-  //--------------------------------------------------------
-  // SETTINGS CARD
-  //--------------------------------------------------------
   Widget _settingsCard() {
     return Padding(
       padding: const EdgeInsets.all(16),
