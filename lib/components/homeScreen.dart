@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:slf/components/notification.dart';
+import 'package:slf/widgets/menu_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -33,12 +34,23 @@ class HomeScreen extends StatelessWidget {
                 ),
                 child: Row(
                   children: [
-                    CircleAvatar(
-                      radius: 22,
-                      backgroundImage: AssetImage(
-                        "assets/profile.png",
-                      ), // Change asset
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const MenuSectionScreen(),
+                          ),
+                        );
+                      },
+                      child: CircleAvatar(
+                        radius: 22,
+                        backgroundImage: AssetImage(
+                          "assets/images/profile.png",
+                        ),
+                      ),
                     ),
+
                     const SizedBox(width: 12),
 
                     const Column(

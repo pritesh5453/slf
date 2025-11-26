@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:slf/widgets/menu_screen.dart';
 
 class PreApprovedLoansScreen extends StatelessWidget {
   const PreApprovedLoansScreen({super.key});
@@ -32,9 +33,21 @@ class PreApprovedLoansScreen extends StatelessWidget {
                 ),
                 child: Row(
                   children: [
-                    const CircleAvatar(
-                      radius: 22,
-                      backgroundImage: AssetImage("assets/profile.png"),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const MenuSectionScreen(),
+                          ),
+                        );
+                      },
+                      child: CircleAvatar(
+                        radius: 22,
+                        backgroundImage: AssetImage(
+                          "assets/images/profile.png",
+                        ),
+                      ),
                     ),
 
                     const SizedBox(width: 12),

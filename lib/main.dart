@@ -9,7 +9,7 @@ void main() async {
   // GLOBAL STATUS BAR SETUP
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
-      statusBarColor: Colors.white, // White background
+      statusBarColor: Colors.transparent, // White background
       statusBarIconBrightness: Brightness.light, // White icons
       statusBarBrightness: Brightness.dark, // Dark status bar (for iOS)
     ),
