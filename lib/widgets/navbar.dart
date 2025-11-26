@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:slf/components/homeScreen.dart';
 import 'package:slf/components/loan_screen.dart';
+import 'package:slf/components/pre_approved_screen.dart';
 
 /// EMS App Bottom Tabs
 enum BottomTab { home, loan, preapproved }
@@ -39,7 +40,7 @@ class _MainHomeScreenState extends ConsumerState<MainHomeScreen> {
     final pages = {
       BottomTab.home: const HomeScreen(),
       BottomTab.loan: const ActiveLoansScreen(),
-      BottomTab.preapproved: const HomeScreen(),
+      BottomTab.preapproved: const PreApprovedLoansScreen(),
     };
 
     return Scaffold(
@@ -80,12 +81,9 @@ class _MainHomeScreenState extends ConsumerState<MainHomeScreen> {
 
                     items: [
                       _navItemIcon(Icons.home, selectedTab == BottomTab.home),
+                      _navItemIcon(Icons.wallet, selectedTab == BottomTab.loan),
                       _navItemIcon(
-                        Icons.fact_check_outlined,
-                        selectedTab == BottomTab.loan,
-                      ),
-                      _navItemIcon(
-                        Icons.person_outline,
+                        Icons.approval,
                         selectedTab == BottomTab.preapproved,
                       ),
                     ],
