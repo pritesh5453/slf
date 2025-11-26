@@ -28,7 +28,9 @@ class LoginScreen extends StatelessWidget {
                 decoration: const BoxDecoration(
                   shape: BoxShape.circle,
                   image: DecorationImage(
-                    image: AssetImage("assets/logo.png"), // <-- CHANGE ASSET
+                    image: AssetImage(
+                      "assets/images/logo.png",
+                    ), // <-- CHANGE ASSET
                     fit: BoxFit.cover,
                   ),
                 ),

@@ -1,9 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart'; // <-- IMPORTANT
+import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:slf/Auth/loginScreen.dart';
 
-void main() {
-  runApp(const ProviderScope(child: MyApp())); // <-- WRAPPED HERE
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // GLOBAL STATUS BAR SETUP
+  SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(
+      statusBarColor: Colors.white, // White background
+      statusBarIconBrightness: Brightness.light, // White icons
+      statusBarBrightness: Brightness.dark, // Dark status bar (for iOS)
+    ),
+  );
+
+  runApp(const ProviderScope(child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -11,9 +23,10 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: LoginScreen(),
+
+      home: const LoginScreen(),
     );
   }
 }
