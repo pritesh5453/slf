@@ -243,10 +243,10 @@ class _MenuSectionScreenState extends State<MenuSectionScreen>
       child: Column(
         children: [
           _readonlyField("Pritesh Pawar"),
-          _readonlyField("+91 9869311557"),
+          _readonlyField("+91 8552011102"),
           _readonlyField("pritesh123@gmail.com"),
           _readonlyField("18 April 1999"),
-          _readonlyField("Tidele Colony, Nashik"),
+          _readonlyField("Tidke Colony, Nashik"),
           const SizedBox(height: 10),
           Container(
             padding: const EdgeInsets.all(12),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:slf/components/enter_amount.dart';
 
 class LoanDetailsScreen extends StatelessWidget {
   final String loanId;
@@ -326,7 +327,7 @@ class LoanDetailsScreen extends StatelessWidget {
                         width: double.infinity,
                         height: 48,
                         child: ElevatedButton(
-                          onPressed: () {},
+                          onPressed: () => _showPaymentSheet(context),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF0B2B66),
                             shape: RoundedRectangleBorder(
@@ -514,4 +515,214 @@ class _tableCell extends StatelessWidget {
       ),
     );
   }
+}
+
+void _showPaymentSheet(BuildContext context) {
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.white,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+    ),
+    builder: (context) {
+      return StatefulBuilder(
+        builder: (context, setState) {
+          int selected = 1; // 1 = pay total, 2 = pay minimum, 3 = custom
+
+          return Padding(
+            padding: MediaQuery.of(context).viewInsets,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // CLOSE BUTTON
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      GestureDetector(
+                        onTap: () => Navigator.pop(context),
+                        child: const Icon(Icons.close, size: 24),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 10),
+
+                  // ---------------- OPTION 1 ----------------
+                  GestureDetector(
+                    onTap: () => setState(() => selected = 1),
+                    child: Container(
+                      padding: const EdgeInsets.all(14),
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: selected == 1 ? Colors.blue : Colors.black26,
+                          width: 1.3,
+                        ),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        children: [
+                          Radio(
+                            value: 1,
+                            groupValue: selected,
+                            activeColor: Colors.blue,
+                            onChanged: (v) => setState(() => selected = 1),
+                          ),
+                          const SizedBox(width: 6),
+                          const Text(
+                            "Pay total",
+                            style: TextStyle(fontSize: 16),
+                          ),
+                          const Spacer(),
+                          const Text(
+                            "₹ 80,000",
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 15,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 14),
+
+                  // ---------------- OPTION 2 ----------------
+                  GestureDetector(
+                    onTap: () => setState(() => selected = 2),
+                    child: Container(
+                      padding: const EdgeInsets.all(14),
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: selected == 2 ? Colors.blue : Colors.black26,
+                          width: 1.3,
+                        ),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        children: [
+                          Radio(
+                            value: 2,
+                            groupValue: selected,
+                            activeColor: Colors.blue,
+                            onChanged: (v) => setState(() => selected = 2),
+                          ),
+                          const SizedBox(width: 6),
+                          const Text(
+                            "Pay minimum",
+                            style: TextStyle(fontSize: 16),
+                          ),
+                          const Spacer(),
+                          const Text(
+                            "₹ 25,000",
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 15,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 14),
+
+                  // ---------------- OPTION 3 (Custom) ----------------
+                  GestureDetector(
+                    onTap: () => setState(() => selected = 3),
+                    child: Container(
+                      padding: const EdgeInsets.all(14),
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: selected == 3 ? Colors.blue : Colors.black26,
+                          width: 1.3,
+                        ),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        children: [
+                          Radio(
+                            value: 3,
+                            groupValue: selected,
+                            activeColor: Colors.blue,
+                            onChanged: (v) => setState(() => selected = 3),
+                          ),
+                          const SizedBox(width: 6),
+                          const Expanded(
+                            child: Text(
+                              "Enter other amount",
+                              style: TextStyle(fontSize: 16),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 14),
+
+                  // If custom amount selected → TextField show
+                  if (selected == 3)
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF5F5F5),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const TextField(
+                        keyboardType: TextInputType.number,
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          hintText: "Enter amount",
+                        ),
+                      ),
+                    ),
+
+                  const SizedBox(height: 20),
+
+                  // PAY NOW BUTTON
+                  SizedBox(
+                    width: double.infinity,
+                    height: 48,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const EnterAmountScreen(),
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF0B2B66),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      child: const Text(
+                        "Pay Now",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 10),
+                ],
+              ),
+            ),
+          );
+        },
+      );
+    },
+  );
 }
