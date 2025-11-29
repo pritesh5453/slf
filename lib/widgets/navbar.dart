@@ -80,10 +80,19 @@ class _MainHomeScreenState extends ConsumerState<MainHomeScreen> {
                     iconSize: 0,
 
                     items: [
-                      _navItemIcon(Icons.home, selectedTab == BottomTab.home),
-                      _navItemIcon(Icons.wallet, selectedTab == BottomTab.loan),
-                      _navItemIcon(
-                        Icons.approval,
+                      _navCustom(
+                        "assets/icons/home.png",
+                        "Home",
+                        selectedTab == BottomTab.home,
+                      ),
+                      _navCustom(
+                        "assets/icons/loan.png",
+                        "Loan",
+                        selectedTab == BottomTab.loan,
+                      ),
+                      _navCustom(
+                        "assets/icons/preapproved.png",
+                        "Pre-Approved",
                         selectedTab == BottomTab.preapproved,
                       ),
                     ],
@@ -112,4 +121,41 @@ class _MainHomeScreenState extends ConsumerState<MainHomeScreen> {
       label: "",
     );
   }
+}
+
+BottomNavigationBarItem _navCustom(
+  String asset,
+  String label,
+  bool isSelected,
+) {
+  return BottomNavigationBarItem(
+    label: "",
+    icon: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: isSelected ? Colors.blue : Colors.transparent,
+            shape: BoxShape.circle,
+          ),
+          child: Image.asset(
+            asset,
+            height: 22,
+            width: 22,
+            color: isSelected ? Colors.white : Colors.black,
+          ),
+        ),
+        const SizedBox(height: 3),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 11,
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+            color: isSelected ? Colors.blue : Colors.black54,
+          ),
+        ),
+      ],
+    ),
+  );
 }
