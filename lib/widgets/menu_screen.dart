@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:slf/model/menuModel.dart';
+import 'package:slf/utils/global.dart'; // menuUser
 
 class MenuSectionScreen extends StatefulWidget {
   const MenuSectionScreen({super.key});
@@ -20,13 +22,12 @@ class _MenuSectionScreenState extends State<MenuSectionScreen>
 
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 2),
+      duration: const Duration(milliseconds: 200),
     );
 
-    // LEFT SIDE SLIDE
     _slideAnimation = Tween(
-      begin: const Offset(-1.0, 0.0), // Slide from left
-      end: const Offset(0.0, 0.0),
+      begin: const Offset(-1.0, 0.0),
+      end: Offset.zero,
     ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
 
     _controller.forward();
@@ -42,41 +43,36 @@ class _MenuSectionScreenState extends State<MenuSectionScreen>
   Widget build(BuildContext context) {
     final w = MediaQuery.of(context).size.width;
 
-    return SafeArea(
-      // 🔥 SafeArea added HERE
+    // 🔥 Get global menu user
+    final MenuCustomer? user = menuUser;
+
+    return Drawer(
       child: Stack(
         children: [
-          // ---------- BACKGROUND LIGHT FADE ----------
           GestureDetector(
             onTap: () => Navigator.pop(context),
-            child: Container(
-              color: Colors.black.withOpacity(0.10), // light fade
-            ),
+            child: Container(color: Colors.black.withOpacity(0.10)),
           ),
 
-          // ---------- LEFT SLIDING PANEL ----------
           Align(
             alignment: Alignment.centerLeft,
             child: SlideTransition(
               position: _slideAnimation,
-
               child: Material(
-                elevation: 8,
+                elevation: 10,
                 color: Colors.white,
                 borderRadius: const BorderRadius.only(
                   topRight: Radius.circular(16),
                   bottomRight: Radius.circular(16),
                 ),
-
-                child: Container(
+                child: SizedBox(
                   width: w * 0.82,
-                  height: double.infinity,
-
                   child: SafeArea(
-                    // Inner SafeArea remains
                     child: Column(
                       children: [
-                        // ---------------- HEADER ----------------
+                        // ----------------------------------------------------
+                        // HEADER
+                        // ----------------------------------------------------
                         Padding(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 16,
@@ -84,26 +80,30 @@ class _MenuSectionScreenState extends State<MenuSectionScreen>
                           ),
                           child: Row(
                             children: [
-                              const CircleAvatar(
-                                radius: 22,
-                                backgroundImage: AssetImage(
-                                  "assets/images/profile.png",
-                                ),
+                              CircleAvatar(
+                                radius: 26,
+                                backgroundImage: user?.profileImage != null
+                                    ? NetworkImage(user!.profileImage!)
+                                    : const AssetImage(
+                                            "assets/images/profile.png",
+                                          )
+                                          as ImageProvider,
                               ),
                               const SizedBox(width: 10),
-                              const Column(
+
+                              Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    "Pritesh Pawar",
-                                    style: TextStyle(
+                                    "${user?.firstName ?? ""} ${user?.lastName ?? ""}",
+                                    style: const TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
                                   Text(
-                                    "ID : SLF-123512345",
-                                    style: TextStyle(
+                                    "ID : ${user?.id ?? "-"}",
+                                    style: const TextStyle(
                                       color: Colors.black54,
                                       fontSize: 13,
                                     ),
@@ -121,6 +121,9 @@ class _MenuSectionScreenState extends State<MenuSectionScreen>
 
                         const Divider(height: 1),
 
+                        // ----------------------------------------------------
+                        // MENU TILES
+                        // ----------------------------------------------------
                         Expanded(
                           child: SingleChildScrollView(
                             child: Column(
@@ -138,7 +141,7 @@ class _MenuSectionScreenState extends State<MenuSectionScreen>
                                   },
                                 ),
                                 if (selected == "personal")
-                                  _personalDetailsCard(),
+                                  _personalDetailsCard(user),
 
                                 // CONTACT US
                                 _menuTile(
@@ -208,9 +211,41 @@ class _MenuSectionScreenState extends State<MenuSectionScreen>
     );
   }
 
-  //--------------------------------------------------------
+  // --------------------------------------------------------
+  // PERSONAL DETAILS CARD
+  // --------------------------------------------------------
+  Widget _personalDetailsCard(MenuCustomer? user) {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        children: [
+          _readonlyField(user?.printName ?? ""), // Full name
+          _readonlyField("+91 ${user?.mobile ?? ""}"), // Mobile
+          _readonlyField(user?.email ?? ""), // Email
+          _readonlyField(user?.dob?.split("T").first ?? ""), // DOB
+          _readonlyField(user?.permanentAddress ?? "Not Available"), // Address
+          const SizedBox(height: 10),
+
+          Container(
+            padding: const EdgeInsets.all(12),
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: Colors.red.shade50,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: const Text(
+              "Note: These details are non-editable.",
+              style: TextStyle(color: Colors.red, fontSize: 12),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // --------------------------------------------------------
   // MENU TILE
-  //--------------------------------------------------------
+  // --------------------------------------------------------
   Widget _menuTile({
     required String title,
     required bool isSelected,
@@ -234,37 +269,9 @@ class _MenuSectionScreenState extends State<MenuSectionScreen>
     );
   }
 
-  //--------------------------------------------------------
-  // CARDS
-  //--------------------------------------------------------
-  Widget _personalDetailsCard() {
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        children: [
-          _readonlyField("Pritesh Pawar"),
-          _readonlyField("+91 8552011102"),
-          _readonlyField("pritesh123@gmail.com"),
-          _readonlyField("18 April 1999"),
-          _readonlyField("Tidke Colony, Nashik"),
-          const SizedBox(height: 10),
-          Container(
-            padding: const EdgeInsets.all(12),
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: Colors.red.shade50,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: const Text(
-              "Note: These details are non-editable.",
-              style: TextStyle(color: Colors.red, fontSize: 12),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
+  // --------------------------------------------------------
+  // CONTACT US CARD
+  // --------------------------------------------------------
   Widget _contactUsCard() {
     return Padding(
       padding: const EdgeInsets.all(16),
@@ -279,6 +286,9 @@ class _MenuSectionScreenState extends State<MenuSectionScreen>
     );
   }
 
+  // --------------------------------------------------------
+  // SETTINGS CARD
+  // --------------------------------------------------------
   Widget _settingsCard() {
     return Padding(
       padding: const EdgeInsets.all(16),
@@ -311,9 +321,9 @@ class _MenuSectionScreenState extends State<MenuSectionScreen>
     );
   }
 
-  //--------------------------------------------------------
+  // --------------------------------------------------------
   // READONLY FIELD
-  //--------------------------------------------------------
+  // --------------------------------------------------------
   Widget _readonlyField(String value) {
     return Container(
       width: double.infinity,

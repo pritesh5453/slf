@@ -1,206 +1,238 @@
 import 'package:flutter/material.dart';
+import 'package:slf/model/PreApprovedLoanmodel.dart';
+import 'package:slf/services/preapproved_services.dart';
 import 'package:slf/widgets/menu_screen.dart';
 
-class PreApprovedLoansScreen extends StatelessWidget {
+class PreApprovedLoansScreen extends StatefulWidget {
   const PreApprovedLoansScreen({super.key});
+
+  @override
+  State<PreApprovedLoansScreen> createState() => _PreApprovedLoansScreenState();
+}
+
+class _PreApprovedLoansScreenState extends State<PreApprovedLoansScreen> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  String _getInterestRate(List<InterestRateModel> rates) {
+    if (rates.isEmpty) return "N/A";
+
+    final first = rates.firstWhere(
+      (e) => e.term == "0-30",
+      orElse: () => InterestRateModel(term: "", rate: 0),
+    );
+
+    return "${first.rate}%";
+  }
 
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
 
     return Scaffold(
+      key: _scaffoldKey,
+      drawer: const MenuSectionScreen(),
+
       backgroundColor: Colors.white,
+
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // ---------------- TOP BLUE HEADER ----------------
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.only(
-                  top: 45,
-                  left: 20,
-                  right: 20,
-                  bottom: 20,
-                ),
-                decoration: const BoxDecoration(
-                  color: Color(0xFF022A7C),
-                  borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(20),
-                    bottomRight: Radius.circular(20),
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const MenuSectionScreen(),
-                          ),
-                        );
-                      },
-                      child: CircleAvatar(
-                        radius: 22,
-                        backgroundImage: AssetImage(
-                          "assets/images/profile.png",
-                        ),
+        child: FutureBuilder<PreApprovedLoanResponse?>(
+          future: PreApprovedLoanService.getPreApprovedLoans(1),
+          builder: (context, snapshot) {
+            if (!snapshot.hasData) {
+              return const Center(
+                child: CircularProgressIndicator(color: Colors.blue),
+              );
+            }
+
+            final data = snapshot.data!;
+            final loans = data.loans;
+            final totalPreApprovedLoan = data.totalPreApprovedLoan;
+
+            return SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // ---------------- TOP BLUE HEADER ----------------
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.only(
+                      top: 45,
+                      left: 20,
+                      right: 20,
+                      bottom: 20,
+                    ),
+                    decoration: const BoxDecoration(
+                      color: Color(0xFF022A7C),
+                      borderRadius: BorderRadius.only(
+                        bottomLeft: Radius.circular(20),
+                        bottomRight: Radius.circular(20),
                       ),
                     ),
-
-                    const SizedBox(width: 12),
-
-                    const Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    child: Row(
                       children: [
-                        Text(
-                          "Welcome Back,",
-                          style: TextStyle(color: Colors.white70, fontSize: 14),
-                        ),
-                        Text(
-                          "Pritesh Pawar",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 17,
-                            fontWeight: FontWeight.w600,
+                        GestureDetector(
+                          onTap: () {
+                            _scaffoldKey.currentState!.openDrawer();
+                          },
+                          child: const CircleAvatar(
+                            radius: 22,
+                            backgroundImage: AssetImage(
+                              "assets/images/profile.png",
+                            ),
                           ),
                         ),
-                      ],
-                    ),
 
-                    const Spacer(),
-                    const Icon(
-                      Icons.notifications_none,
-                      color: Colors.white,
-                      size: 28,
-                    ),
-                  ],
-                ),
-              ),
+                        const SizedBox(width: 12),
 
-              const SizedBox(height: 12),
-
-              // ---------------- PRE APPROVED TITLE CARD ----------------
-              Center(
-                child: Container(
-                  width: width * 0.85,
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 18,
-                    horizontal: 20,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: const [
-                      BoxShadow(blurRadius: 8, color: Colors.black12),
-                    ],
-                  ),
-                  child: const Column(
-                    children: [
-                      Text(
-                        "Pre-approved Loan",
-                        style: TextStyle(
-                          fontSize: 17,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      SizedBox(height: 6),
-                      Text(
-                        "Unlock extra funds. Visit your nearest SLF store",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(color: Colors.black54, fontSize: 14),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 20),
-
-              // ---------------- YELLOW PRE APPROVED OFFER BOX ----------------
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFFFF5DB),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFFFE9B3),
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                        child: const Icon(
-                          Icons.lightbulb_outline,
-                          color: Colors.orange,
-                        ),
-                      ),
-                      const SizedBox(width: 14),
-                      const Expanded(
-                        child: Column(
+                        Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              "You have ₹ 75,000 pre-approved!",
+                            const Text(
+                              "Welcome Back,",
                               style: TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.orange,
+                                color: Colors.white70,
+                                fontSize: 14,
                               ),
                             ),
-                            SizedBox(height: 6),
                             Text(
-                              "You can still avail an additional amount from your existing gold value. Claim it anytime — your eligibility is already approved.",
-                              style: TextStyle(
-                                color: Colors.black87,
-                                fontSize: 13,
+                              loans.isNotEmpty ? loans.first.borrower : "User",
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 17,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
                           ],
                         ),
-                      ),
-                    ],
+
+                        const Spacer(),
+                        const Icon(
+                          Icons.notifications_none,
+                          color: Colors.white,
+                          size: 28,
+                        ),
+                      ],
+                    ),
                   ),
-                ),
+
+                  const SizedBox(height: 12),
+
+                  // ---------------- PRE APPROVED TITLE CARD ----------------
+                  Center(
+                    child: Container(
+                      width: width * 0.85,
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 18,
+                        horizontal: 20,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: const [
+                          BoxShadow(blurRadius: 8, color: Colors.black12),
+                        ],
+                      ),
+                      child: const Column(
+                        children: [
+                          Text(
+                            "Pre-approved Loan",
+                            style: TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          SizedBox(height: 6),
+                          Text(
+                            "Unlock extra funds. Visit your nearest SLF store",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: Colors.black54,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  // ---------------- YELLOW PRE APPROVED OFFER BOX ----------------
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFFF5DB),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFFFE9B3),
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                            child: const Icon(
+                              Icons.lightbulb_outline,
+                              color: Colors.orange,
+                            ),
+                          ),
+                          const SizedBox(width: 14),
+
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "You have ₹ $totalPreApprovedLoan pre-approved!",
+                                  style: const TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.orange,
+                                  ),
+                                ),
+                                const SizedBox(height: 6),
+                                const Text(
+                                  "You can still avail an additional amount from your existing gold value. Claim it anytime — your eligibility is already approved.",
+                                  style: TextStyle(
+                                    color: Colors.black87,
+                                    fontSize: 13,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 24),
+
+                  // ---------------- DYNAMIC LOAN CARDS ----------------
+                  for (var loan in loans) ...[
+                    _preApprovedLoanCard(
+                      loanId: loan.id.toString(),
+                      eligible: "₹ ${loan.totalValuation}",
+                      availed: "₹ ${loan.takenLoan}",
+                      available: "₹ ${loan.maxEligible}",
+                      rate: _getInterestRate(loan.effectiveInterestRates),
+                      weight:
+                          "${loan.pledgeItemList.isNotEmpty ? loan.pledgeItemList.first.netWeight : 0} g",
+                      type: loan.schemeType,
+                    ),
+                    const SizedBox(height: 16),
+                  ],
+
+                  const SizedBox(height: 30),
+                ],
               ),
-
-              const SizedBox(height: 24),
-
-              // ---------------- LOAN CARD 1 ----------------
-              _preApprovedLoanCard(
-                loanId: "SLF25402158",
-                eligible: "₹ 2,00,000",
-                availed: "₹ 1,50,000",
-                available: "₹ 50,000",
-                rate: "12%",
-                weight: "125g",
-                type: "EMI",
-              ),
-
-              const SizedBox(height: 16),
-
-              // ---------------- LOAN CARD 2 ----------------
-              _preApprovedLoanCard(
-                loanId: "SLF25400024",
-                eligible: "₹ 1,20,000",
-                availed: "₹ 95,000",
-                available: "₹ 25,000",
-                rate: "12%",
-                weight: "78g",
-                type: "Bullet",
-              ),
-
-              const SizedBox(height: 30),
-            ],
-          ),
+            );
+          },
         ),
       ),
     );
@@ -233,6 +265,7 @@ class PreApprovedLoansScreen extends StatelessWidget {
               "Loan ID - $loanId",
               style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
             ),
+
             const SizedBox(height: 12),
 
             Row(
@@ -296,7 +329,7 @@ class PreApprovedLoansScreen extends StatelessWidget {
 
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: const [Text("Payment Type :"), Text("EMI")],
+              children: [const Text("Payment Type :"), Text(type)],
             ),
           ],
         ),

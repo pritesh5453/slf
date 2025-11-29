@@ -1,350 +1,304 @@
 import 'package:flutter/material.dart';
 import 'package:slf/components/notification.dart';
+import 'package:slf/model/homescreen/homescreen_model.dart';
+import 'package:slf/services/homescreen_services.dart';
 import 'package:slf/widgets/menu_screen.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
+  State<HomeScreen> createState() => _HomeScreenState();
+}
 
+class _HomeScreenState extends State<HomeScreen> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  late Future<LoanDashboardModel?> dashboardFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    dashboardFuture = LoanService().getDashboardData("USER_TOKEN_HERE");
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
+      drawer: MenuSectionScreen(),
       backgroundColor: Colors.white,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // ------------------ TOP BLUE SECTION ------------------
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.only(
-                  top: 45,
-                  left: 20,
-                  right: 20,
-                  bottom: 20,
-                ),
-                decoration: const BoxDecoration(
-                  color: Color(0xFF022A7C),
-                  borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(20),
-                    bottomRight: Radius.circular(20),
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const MenuSectionScreen(),
-                          ),
-                        );
-                      },
-                      child: CircleAvatar(
-                        radius: 22,
-                        backgroundImage: AssetImage(
-                          "assets/images/profile.png",
-                        ),
+      body: FutureBuilder<LoanDashboardModel?>(
+        future: dashboardFuture,
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          final data = snapshot.data!;
+
+          return SafeArea(
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // 🔵 TOP BLUE HEADER
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.only(
+                      top: 40,
+                      left: 20,
+                      right: 20,
+                      bottom: 40,
+                    ),
+                    decoration: const BoxDecoration(
+                      color: Color(0xff083A8C),
+                      borderRadius: BorderRadius.only(
+                        bottomLeft: Radius.circular(30),
+                        bottomRight: Radius.circular(30),
                       ),
                     ),
-
-                    const SizedBox(width: 12),
-
-                    const Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    child: Row(
                       children: [
-                        Text(
-                          "Welcome Back,",
-                          style: TextStyle(color: Colors.white70, fontSize: 14),
+                        GestureDetector(
+                          onTap: () => _scaffoldKey.currentState!.openDrawer(),
+                          child: const CircleAvatar(
+                            radius: 25,
+                            backgroundImage: AssetImage(
+                              "assets/images/profile.png",
+                            ),
+                          ),
                         ),
-                        Text(
-                          "Pritesh Pawar",
-                          style: TextStyle(
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Welcome Back,",
+                                style: const TextStyle(
+                                  color: Colors.white70, // 🔥 Faint/Light
+                                  fontSize: 14,
+                                ),
+                              ),
+                              Text(
+                                data.activeLoans.isNotEmpty
+                                    ? data.activeLoans.first.borrower
+                                    : "User",
+                                style: const TextStyle(
+                                  color: Colors.white, // 🔥 Bright white
+                                  fontSize: 17,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => NotificationsScreen(),
+                            ),
+                          ),
+                          child: const Icon(
+                            Icons.notifications_none,
+                            size: 30,
                             color: Colors.white,
-                            fontSize: 17,
-                            fontWeight: FontWeight.w600,
                           ),
                         ),
                       ],
                     ),
-
-                    const Spacer(),
-
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => NotificationsScreen(),
-                          ),
-                        );
-                        print("🔔 Notifications tapped");
-                      },
-                      child: const Icon(
-                        Icons.notifications_none,
-                        color: Colors.white,
-                        size: 28,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 15),
-
-              // ------------------ TOTAL OUTSTANDING ------------------
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black12,
-                        blurRadius: 8,
-                        offset: Offset(0, 3),
-                      ),
-                    ],
                   ),
-                  child: const Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Total Outstanding",
-                        style: TextStyle(color: Colors.black54, fontSize: 15),
-                      ),
-                      SizedBox(height: 5),
-                      Text(
-                        "₹ 2,45,000",
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
 
-              const SizedBox(height: 15),
-
-              // ------------------ EMI DUE CARD ------------------
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFFFF1F1),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Icon(Icons.warning_amber_rounded, color: Colors.red),
-                          SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              "Next EMI Due - 15 Nov 2025",
-                              style: TextStyle(
-                                color: Colors.red,
-                                fontSize: 15,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 10),
-                      Text(
-                        "EMI of ₹13,325 is now due — Pay Now",
-                        style: TextStyle(color: Colors.red, fontSize: 14),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 20),
-
-              // ------------------ ACTIVE LOANS HEADER ------------------
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Row(
-                  children: [
-                    const Text(
-                      "Active Loans (3)",
-                      style: TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const Spacer(),
-                    const Text(
-                      "View All",
-                      style: TextStyle(
-                        color: Colors.red,
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(width: 4),
-                    const Icon(
-                      Icons.arrow_forward,
-                      color: Colors.red,
-                      size: 18,
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 15),
-
-              // ------------------ LOAN CARD 1 ------------------
-              buildLoanCard(
-                loanId: "SLF25402158",
-                amount: "₹ 1,50,000",
-                weight: "125g",
-                rate: "12% p.a.",
-                nextEmi: "₹13,325 on 15 Nov",
-              ),
-
-              const SizedBox(height: 12),
-
-              // ------------------ LOAN CARD 2 ------------------
-              buildLoanCard(
-                loanId: "SLF25400024",
-                amount: "₹ 95,000",
-                weight: "78g",
-                rate: "12% p.a.",
-                nextEmi: "—",
-              ),
-
-              const SizedBox(height: 20),
-
-              // ------------------ SPECIAL OFFERS ------------------
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: const Text(
-                  "Special Offers",
-                  style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
-                ),
-              ),
-
-              const SizedBox(height: 15),
-
-              // OFFER CARD
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(18),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFFFF7E5),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(12),
+                  // ⭐ TOTAL OUTSTANDING
+                  Transform.translate(
+                    offset: const Offset(0, -30),
+                    child: Center(
+                      child: Container(
+                        width: MediaQuery.of(context).size.width * 0.86,
+                        padding: const EdgeInsets.all(11),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFFFD37A),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: const Icon(
-                          Icons.card_giftcard,
                           color: Colors.white,
-                          size: 28,
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.12),
+                              blurRadius: 20,
+                              offset: const Offset(0, 5),
+                            ),
+                          ],
                         ),
-                      ),
-                      const SizedBox(width: 15),
-                      const Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              "Festive Offer!",
-                              style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 16,
+                            Center(
+                              child: const Text(
+                                "Total Outstanding",
+                                style: TextStyle(
+                                  color: Colors.black54,
+                                  fontSize: 16,
+                                ),
                               ),
                             ),
-                            SizedBox(height: 5),
-                            Text(
-                              "Get 0.5% reduced interest on new gold loans this month",
-                              style: TextStyle(
-                                color: Colors.black54,
-                                fontSize: 14,
+                            const SizedBox(height: 6),
+                            Center(
+                              child: Text(
+                                "₹ ${data.totalOutstanding}",
+                                style: const TextStyle(
+                                  fontSize: 30,
+                                  fontWeight: FontWeight.w800,
+                                ),
                               ),
                             ),
                           ],
                         ),
                       ),
-                      const Icon(Icons.arrow_forward, color: Colors.red),
-                    ],
+                    ),
                   ),
-                ),
-              ),
 
-              const SizedBox(height: 40),
-            ],
-          ),
-        ),
+                  // ⭐ EMI BAR STATIC
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 22),
+                    child: Container(
+                      padding: const EdgeInsets.all(18),
+                      decoration: BoxDecoration(
+                        color: const Color(0xffFFE8E8),
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: Row(
+                        children: const [
+                          Icon(Icons.error, color: Colors.red, size: 30),
+                          SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "Next EMI Due - 15 Nov 2025",
+                                  style: TextStyle(
+                                    color: Colors.red,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 15,
+                                  ),
+                                ),
+                                SizedBox(height: 4),
+                                Text(
+                                  "EMI of ₹13,225 is now due — Pay Now",
+                                  style: TextStyle(
+                                    color: Colors.black87,
+                                    fontSize: 13,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 25),
+
+                  // ⭐ ACTIVE LOANS TITLE
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 22),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Active Loans (${data.activeLoansCount})",
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const Row(
+                          children: [
+                            Text(
+                              "View All",
+                              style: TextStyle(color: Colors.red),
+                            ),
+                            SizedBox(width: 4),
+                            Icon(
+                              Icons.arrow_forward,
+                              color: Colors.red,
+                              size: 15,
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  // ⭐ ACTIVE LOAN LIST
+                  ...data.activeLoans.map((loan) {
+                    final item = loan.pledgeItemList.isNotEmpty
+                        ? loan.pledgeItemList.first
+                        : null;
+
+                    return buildLoanCard(
+                      id: loan.id.toString(),
+                      amount: "₹ ${loan.loanAmount}",
+                      weight: "${item?.netWeight ?? '--'}g",
+                      date: loan.approvalDate ?? "--",
+                      nextEmi: null, // nullable
+                    );
+                  }).toList(),
+
+                  const SizedBox(height: 50),
+                ],
+              ),
+            ),
+          );
+        },
       ),
     );
   }
 
-  // --------------- Loan Card Widget -----------------
+  // ⭐ Loan Card
   Widget buildLoanCard({
-    required String loanId,
+    required String id,
     required String amount,
     required String weight,
-    required String rate,
-    required String nextEmi,
+    required String date,
+    String? nextEmi,
   }) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 8),
       child: Container(
-        width: double.infinity,
         padding: const EdgeInsets.all(18),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(18),
           border: Border.all(color: Colors.black12),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  "Loan ID - $loanId",
-                  style: const TextStyle(fontWeight: FontWeight.w600),
+                  "Loan ID - $id",
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                  ),
                 ),
-                const Spacer(),
                 Container(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
+                    horizontal: 12,
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFE7FBE8),
+                    color: Colors.green.shade100,
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: const Text(
                     "Active",
-                    style: TextStyle(
-                      color: Colors.green,
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: TextStyle(color: Colors.green),
                   ),
                 ),
               ],
@@ -352,23 +306,25 @@ class HomeScreen extends StatelessWidget {
             const SizedBox(height: 10),
             Text(
               amount,
-              style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800),
             ),
-
-            const SizedBox(height: 10),
-
+            const SizedBox(height: 12),
             Text(
               "Gold Weight :   $weight",
               style: const TextStyle(color: Colors.black54),
             ),
             Text(
-              "Interest Rate :   $rate",
+              "Loan Date :   $date",
               style: const TextStyle(color: Colors.black54),
             ),
-            Text(
-              "Next EMI :   $nextEmi",
-              style: const TextStyle(color: Colors.black54),
-            ),
+            if (nextEmi != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 6),
+                child: Text(
+                  "Next EMI :   $nextEmi",
+                  style: const TextStyle(color: Colors.black87),
+                ),
+              ),
           ],
         ),
       ),

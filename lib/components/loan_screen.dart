@@ -1,68 +1,94 @@
 import 'package:flutter/material.dart';
 import 'package:slf/components/loanDetails.dart';
+import 'package:slf/model/activeloans.dart';
+import 'package:slf/services/loan_services.dart';
 import 'package:slf/widgets/menu_screen.dart';
 
-class ActiveLoansScreen extends StatelessWidget {
+class ActiveLoansScreen extends StatefulWidget {
   const ActiveLoansScreen({super.key});
+
+  @override
+  State<ActiveLoansScreen> createState() => _ActiveLoansScreenState();
+}
+
+class _ActiveLoansScreenState extends State<ActiveLoansScreen> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  ActiveLoansResponse? data;
+  bool loading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchData();
+  }
+
+  fetchData() async {
+    setState(() {
+      loading = true;
+    });
+    data = await LoanService().fetchActiveLoans();
+    setState(() {
+      loading = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
 
+    if (loading || data == null) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
     return Scaffold(
+      key: _scaffoldKey,
+      drawer: MenuSectionScreen(),
       backgroundColor: Colors.white,
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // ---------------- TOP BLUE HEADER ----------------
+              // ---------------- TOP HEADER ----------------
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.only(
                   top: 45,
                   left: 20,
                   right: 20,
-                  bottom: 20,
+                  bottom: 40,
                 ),
                 decoration: const BoxDecoration(
-                  color: Color(0xFF022A7C),
+                  color: Color(0xFF083A8C),
                   borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(20),
-                    bottomRight: Radius.circular(20),
+                    bottomLeft: Radius.circular(28),
+                    bottomRight: Radius.circular(28),
                   ),
                 ),
                 child: Row(
                   children: [
                     GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const MenuSectionScreen(),
-                          ),
-                        );
-                      },
-                      child: CircleAvatar(
-                        radius: 22,
+                      onTap: () => _scaffoldKey.currentState!.openDrawer(),
+                      child: const CircleAvatar(
+                        radius: 23,
                         backgroundImage: AssetImage(
                           "assets/images/profile.png",
                         ),
                       ),
                     ),
-
                     const SizedBox(width: 12),
-
-                    const Column(
+                    Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
+                        const Text(
                           "Welcome Back,",
                           style: TextStyle(color: Colors.white70, fontSize: 14),
                         ),
                         Text(
-                          "Pritesh Pawar",
-                          style: TextStyle(
+                          data!.activeLoans.isNotEmpty
+                              ? data!.activeLoans.first.borrower
+                              : "User",
+                          style: const TextStyle(
                             color: Colors.white,
                             fontSize: 17,
                             fontWeight: FontWeight.w600,
@@ -70,7 +96,6 @@ class ActiveLoansScreen extends StatelessWidget {
                         ),
                       ],
                     ),
-
                     const Spacer(),
                     const Icon(
                       Icons.notifications_none,
@@ -81,103 +106,88 @@ class ActiveLoansScreen extends StatelessWidget {
                 ),
               ),
 
-              const SizedBox(height: 10),
-
-              // ---------------- ACTIVE LOANS CARD ----------------
-              Center(
-                child: Container(
-                  width: width * 0.85,
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 18,
-                    horizontal: 20,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: const [
-                      BoxShadow(
-                        blurRadius: 8,
-                        color: Colors.black12,
-                        offset: Offset(0, 3),
-                      ),
-                    ],
-                  ),
-                  child: const Column(
-                    children: [
-                      Text(
-                        "Active Loans",
-                        style: TextStyle(
-                          fontSize: 17,
-                          fontWeight: FontWeight.w600,
+              // -------------- ACTIVE LOANS TITLE CARD --------------
+              Transform.translate(
+                offset: const Offset(0, -30),
+                child: Center(
+                  child: Container(
+                    width: width * 0.86,
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 20,
+                      horizontal: 22,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          blurRadius: 18,
+                          color: Colors.black.withOpacity(0.15),
+                          offset: const Offset(0, 6),
                         ),
-                      ),
-                      SizedBox(height: 6),
-                      Text(
-                        "View your active list below",
-                        style: TextStyle(color: Colors.black54, fontSize: 14),
-                      ),
-                    ],
+                      ],
+                    ),
+                    child: const Column(
+                      children: [
+                        Text(
+                          "Active Loans",
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        SizedBox(height: 4),
+                        Text(
+                          "View your active list below",
+                          style: TextStyle(color: Colors.black54, fontSize: 14),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
-
-              const SizedBox(height: 25),
 
               // ---------------- EMI PAYMENTS ----------------
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20),
-                child: Text(
-                  "EMI Payments",
-                  style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
+              if (data!.activeLoans.isNotEmpty)
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 25),
+                  child: Text(
+                    "EMI Payments",
+                    style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700),
+                  ),
                 ),
-              ),
 
               const SizedBox(height: 12),
 
-              // Loan Card
-              _loanCard(
-                context: context,
-                loanId: "SLF25402158",
-                amount: "₹ 1,50,000",
-                weight: "125g",
-                loanDate: "15 Jan 2025",
-                nextEmi: "₹13,325 on 15 Nov",
-              ),
+              for (int i = 0; i < data!.activeLoans.length; i++)
+                _loanCard(
+                  context: context,
+                  loan: data!.activeLoans[i],
+                  nextEmi: "₹13,325 on 15 Nov",
+                ),
 
               const SizedBox(height: 30),
 
               // ---------------- BULLET PAYMENTS ----------------
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20),
-                child: Text(
-                  "Bullet Payments",
-                  style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
+              if (data!.bulletLoans.isNotEmpty)
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 25),
+                  child: Text(
+                    "Bullet Payments",
+                    style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700),
+                  ),
                 ),
-              ),
 
               const SizedBox(height: 12),
 
-              _loanCard(
-                context: context,
-                loanId: "SLF25400024",
-                amount: "₹ 95,000",
-                weight: "78g",
-                loanDate: "15 July 2025",
-                nextEmi: "—",
-              ),
+              for (int i = 0; i < data!.bulletLoans.length; i++)
+                _loanCard(
+                  context: context,
+                  loan: data!.bulletLoans[i],
+                  nextEmi: "—",
+                ),
 
-              const SizedBox(height: 18),
-
-              _loanCard(
-                context: context,
-                loanId: "SLF25400012",
-                amount: "₹ 1,95,000",
-                weight: "100g",
-                loanDate: "10 Dec 2024",
-                nextEmi: "—",
-              ),
-
-              const SizedBox(height: 40),
+              const SizedBox(height: 30),
             ],
           ),
         ),
@@ -185,48 +195,59 @@ class ActiveLoansScreen extends StatelessWidget {
     );
   }
 
-  // --------------------- LOAN CARD WIDGET ---------------------
+  // ---------------- Loan Card UI ----------------
   Widget _loanCard({
     required BuildContext context,
-    required String loanId,
-    required String amount,
-    required String weight,
-    required String loanDate,
+    required LoanModel loan,
     required String nextEmi,
   }) {
     return GestureDetector(
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (_) => LoanDetailsScreen()),
+          MaterialPageRoute(
+            builder: (_) => LoanDetailsScreen(
+              loanId: loan.id.toString(),
+              userName: loan.borrower,
+              amount: loan.netPayable.toString(),
+              goldWeight: loan.netWeight.toString(),
+              startDate: loan.approvalDate,
+              tenure: "${loan.loanTenure ?? 12} Months",
+              totalPaid: loan.loanAmountPaid.toString(),
+              pledgeItems: loan.pledgeItems,
+              remark: loan.remark,
+              ornamentPhoto: loan.ornamentPhoto,
+            ),
+          ),
         );
-
-        debugPrint("Clicked Loan: $loanId");
       },
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
+        padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 10),
         child: Container(
-          padding: const EdgeInsets.all(18),
+          padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(14),
+            borderRadius: BorderRadius.circular(18),
             border: Border.all(color: Colors.black12),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Top Row → Loan ID + Active Badge
+              // Loan ID Row
               Row(
                 children: [
                   Text(
-                    "Loan ID - $loanId",
-                    style: const TextStyle(fontWeight: FontWeight.w600),
+                    "Loan ID - ${loan.id}",
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14,
+                    ),
                   ),
                   const Spacer(),
                   Container(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 6,
+                      horizontal: 12,
+                      vertical: 5,
                     ),
                     decoration: BoxDecoration(
                       color: const Color(0xFFE7FBE8),
@@ -243,64 +264,48 @@ class ActiveLoansScreen extends StatelessWidget {
                 ],
               ),
 
-              const SizedBox(height: 10),
+              const SizedBox(height: 12),
 
-              // Amount
               Text(
-                amount,
+                "₹ ${loan.netPayable}",
                 style: const TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
+                  fontSize: 23,
+                  fontWeight: FontWeight.w800,
                 ),
               ),
 
               const SizedBox(height: 14),
 
-              // 2-Column Info (Left / Right)
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              Column(
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        "Gold Weight :",
-                        style: TextStyle(color: Colors.black54),
-                      ),
-                      Text(
-                        weight,
-                        style: const TextStyle(fontWeight: FontWeight.w600),
-                      ),
-                    ],
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        "Loan Date :",
-                        style: TextStyle(color: Colors.black54),
-                      ),
-                      Text(
-                        loanDate,
-                        style: const TextStyle(fontWeight: FontWeight.w600),
-                      ),
-                    ],
-                  ),
+                  _rowInfo("Gold Weight :", "${loan.netWeight} g"),
+                  const SizedBox(height: 6),
+                  _rowInfo("Loan Date :", loan.approvalDate.split(" ").first),
                 ],
               ),
 
-              const SizedBox(height: 12),
-
-              nextEmi == "—"
-                  ? const SizedBox()
-                  : Text(
-                      "Next EMI :   $nextEmi",
-                      style: const TextStyle(color: Colors.black87),
-                    ),
+              if (nextEmi != "—") ...[
+                const SizedBox(height: 10),
+                Text(
+                  "Next EMI : $nextEmi",
+                  style: const TextStyle(color: Colors.black87, fontSize: 14),
+                ),
+              ],
             ],
           ),
         ),
       ),
     );
   }
+}
+
+// Row helper
+Widget _rowInfo(String title, String value) {
+  return Row(
+    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    children: [
+      Text(title, style: const TextStyle(color: Colors.black54)),
+      Text(value, style: const TextStyle(fontWeight: FontWeight.w600)),
+    ],
+  );
 }
