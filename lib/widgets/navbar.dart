@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_riverpod/legacy.dart';
+import 'package:flutter_riverpod/legacy.dart' show StateProvider;
 import 'package:slf/components/homeScreen.dart';
 import 'package:slf/components/loan_screen.dart';
 import 'package:slf/components/pre_approved_screen.dart';
 
-/// EMS App Bottom Tabs
 enum BottomTab { home, loan, preapproved }
 
 /// Global bottom nav provider
 final bottomTabProvider = StateProvider<BottomTab>((ref) => BottomTab.home);
 
 class MainHomeScreen extends ConsumerStatefulWidget {
-  final BottomTab? initialTab; // allow null
+  final BottomTab? initialTab;
 
   const MainHomeScreen({super.key, this.initialTab});
 
@@ -25,7 +24,7 @@ class _MainHomeScreenState extends ConsumerState<MainHomeScreen> {
   void initState() {
     super.initState();
 
-    /// Set initial tab (or default)
+    /// Set initial tab (default = home)
     Future.microtask(() {
       ref.read(bottomTabProvider.notifier).state =
           widget.initialTab ?? BottomTab.home;
@@ -36,25 +35,25 @@ class _MainHomeScreenState extends ConsumerState<MainHomeScreen> {
   Widget build(BuildContext context) {
     final selectedTab = ref.watch(bottomTabProvider);
 
-    /// Pages for each tab
-    final pages = {
-      BottomTab.home: const HomeScreen(),
-      BottomTab.loan: const ActiveLoansScreen(),
-      BottomTab.preapproved: const PreApprovedLoansScreen(),
-    };
-
     return Scaffold(
       backgroundColor: Colors.white,
 
       body: Stack(
         children: [
-          /// Main page content
+          /// ⭐ Persistent pages (NO RELOAD) – using IndexedStack
           Padding(
             padding: const EdgeInsets.only(bottom: 90),
-            child: pages[selectedTab]!,
+            child: IndexedStack(
+              index: BottomTab.values.indexOf(selectedTab),
+              children: const [
+                HomeScreen(),
+                ActiveLoansScreen(),
+                PreApprovedLoansScreen(),
+              ],
+            ),
           ),
 
-          /// Bottom navigation bar positioned
+          /// ⭐ Bottom Navigation Bar
           Positioned(
             left: 16,
             right: 16,
@@ -70,6 +69,7 @@ class _MainHomeScreenState extends ConsumerState<MainHomeScreen> {
                       ref.read(bottomTabProvider.notifier).state =
                           BottomTab.values[index];
                     },
+
                     backgroundColor: Colors.white,
                     type: BottomNavigationBarType.fixed,
                     elevation: 0,
@@ -94,23 +94,6 @@ class _MainHomeScreenState extends ConsumerState<MainHomeScreen> {
           ),
         ],
       ),
-    );
-  }
-
-  /// IMAGE TAB ICON
-  BottomNavigationBarItem _navItemAsset(String asset, bool isSelected) {
-    return BottomNavigationBarItem(
-      icon: CircleAvatar(
-        radius: 22,
-        backgroundColor: isSelected ? Colors.blue : Colors.transparent,
-        child: Image.asset(
-          asset,
-          height: 22,
-          width: 22,
-          color: isSelected ? Colors.white : Colors.black,
-        ),
-      ),
-      label: "",
     );
   }
 

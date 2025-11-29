@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:slf/components/loanDetails.dart';
 import 'package:slf/model/activeloans.dart';
 import 'package:slf/services/loan_services.dart';
+import 'package:slf/utils/global.dart';
 import 'package:slf/widgets/menu_screen.dart';
 
 class ActiveLoansScreen extends StatefulWidget {
@@ -53,13 +54,13 @@ class _ActiveLoansScreenState extends State<ActiveLoansScreen> {
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.only(
-                  top: 45,
+                  top: 40,
                   left: 20,
                   right: 20,
                   bottom: 40,
                 ),
                 decoration: const BoxDecoration(
-                  color: Color(0xFF083A8C),
+                  color: Color(0xFF022A7C),
                   borderRadius: BorderRadius.only(
                     bottomLeft: Radius.circular(28),
                     bottomRight: Radius.circular(28),
@@ -69,11 +70,12 @@ class _ActiveLoansScreenState extends State<ActiveLoansScreen> {
                   children: [
                     GestureDetector(
                       onTap: () => _scaffoldKey.currentState!.openDrawer(),
-                      child: const CircleAvatar(
-                        radius: 23,
-                        backgroundImage: AssetImage(
-                          "assets/images/profile.png",
-                        ),
+                      child: CircleAvatar(
+                        radius: 25,
+                        backgroundImage: menuUser?.profileImage != null
+                            ? NetworkImage(menuUser!.profileImage!)
+                            : const AssetImage("assets/images/profile.png")
+                                  as ImageProvider,
                       ),
                     ),
                     const SizedBox(width: 12),

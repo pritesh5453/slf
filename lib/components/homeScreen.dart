@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:slf/components/notification.dart';
 import 'package:slf/model/homescreen/homescreen_model.dart';
 import 'package:slf/services/homescreen_services.dart';
+import 'package:slf/utils/global.dart';
 import 'package:slf/widgets/menu_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -51,7 +52,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       bottom: 40,
                     ),
                     decoration: const BoxDecoration(
-                      color: Color(0xff083A8C),
+                      color: Color(0xFF022A7C),
                       borderRadius: BorderRadius.only(
                         bottomLeft: Radius.circular(30),
                         bottomRight: Radius.circular(30),
@@ -61,11 +62,12 @@ class _HomeScreenState extends State<HomeScreen> {
                       children: [
                         GestureDetector(
                           onTap: () => _scaffoldKey.currentState!.openDrawer(),
-                          child: const CircleAvatar(
+                          child: CircleAvatar(
                             radius: 25,
-                            backgroundImage: AssetImage(
-                              "assets/images/profile.png",
-                            ),
+                            backgroundImage: menuUser?.profileImage != null
+                                ? NetworkImage(menuUser!.profileImage!)
+                                : const AssetImage("assets/images/profile.png")
+                                      as ImageProvider,
                           ),
                         ),
                         const SizedBox(width: 12),
@@ -116,7 +118,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Center(
                       child: Container(
                         width: MediaQuery.of(context).size.width * 0.86,
-                        padding: const EdgeInsets.all(11),
+                        padding: const EdgeInsets.all(9),
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(20),

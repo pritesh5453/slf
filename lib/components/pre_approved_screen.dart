@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:slf/model/PreApprovedLoanmodel.dart';
 import 'package:slf/services/preapproved_services.dart';
+import 'package:slf/utils/global.dart';
 import 'package:slf/widgets/menu_screen.dart';
 
 class PreApprovedLoansScreen extends StatefulWidget {
@@ -56,10 +57,10 @@ class _PreApprovedLoansScreenState extends State<PreApprovedLoansScreen> {
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.only(
-                      top: 45,
+                      top: 40,
                       left: 20,
                       right: 20,
-                      bottom: 20,
+                      bottom: 40,
                     ),
                     decoration: const BoxDecoration(
                       color: Color(0xFF022A7C),
@@ -71,14 +72,13 @@ class _PreApprovedLoansScreenState extends State<PreApprovedLoansScreen> {
                     child: Row(
                       children: [
                         GestureDetector(
-                          onTap: () {
-                            _scaffoldKey.currentState!.openDrawer();
-                          },
-                          child: const CircleAvatar(
-                            radius: 22,
-                            backgroundImage: AssetImage(
-                              "assets/images/profile.png",
-                            ),
+                          onTap: () => _scaffoldKey.currentState!.openDrawer(),
+                          child: CircleAvatar(
+                            radius: 25,
+                            backgroundImage: menuUser?.profileImage != null
+                                ? NetworkImage(menuUser!.profileImage!)
+                                : const AssetImage("assets/images/profile.png")
+                                      as ImageProvider,
                           ),
                         ),
 
@@ -118,39 +118,54 @@ class _PreApprovedLoansScreenState extends State<PreApprovedLoansScreen> {
                   const SizedBox(height: 12),
 
                   // ---------------- PRE APPROVED TITLE CARD ----------------
-                  Center(
-                    child: Container(
-                      width: width * 0.85,
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 18,
-                        horizontal: 20,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: const [
-                          BoxShadow(blurRadius: 8, color: Colors.black12),
-                        ],
-                      ),
-                      child: const Column(
-                        children: [
-                          Text(
-                            "Pre-approved Loan",
-                            style: TextStyle(
-                              fontSize: 17,
-                              fontWeight: FontWeight.w600,
+                  Transform.translate(
+                    offset: const Offset(0, -40),
+                    child: Center(
+                      child: Container(
+                        width: width * 0.86,
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 20,
+                          horizontal: 22,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              blurRadius: 18,
+                              color: Colors.black.withOpacity(0.15),
+                              offset: const Offset(0, 6),
                             ),
-                          ),
-                          SizedBox(height: 6),
-                          Text(
-                            "Unlock extra funds. Visit your nearest SLF store",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: Colors.black54,
-                              fontSize: 14,
+                          ],
+                        ),
+                        child: const Column(
+                          children: [
+                            Text(
+                              "Pre-Aprroved Loans",
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w700,
+                              ),
                             ),
-                          ),
-                        ],
+                            SizedBox(height: 4),
+                            Center(
+                              child: Text(
+                                "Unlock your extra funds. Visit your",
+                                style: TextStyle(
+                                  color: Colors.black54,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ),
+                            Text(
+                              "nearest SLF store",
+                              style: TextStyle(
+                                color: Colors.black54,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
