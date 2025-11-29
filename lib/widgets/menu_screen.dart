@@ -20,6 +20,9 @@ class _MenuSectionScreenState extends State<MenuSectionScreen>
   void initState() {
     super.initState();
 
+    // 🔥 PRINT ALL MENU USER DATA IN CONSOLE
+    printUserData();
+
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 200),
@@ -31,6 +34,29 @@ class _MenuSectionScreenState extends State<MenuSectionScreen>
     ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
 
     _controller.forward();
+  }
+
+  // 🔥 Print function for debugging API data
+  void printUserData() {
+    print("=========== MENU USER DEBUG LOG ===========");
+
+    if (menuUser == null) {
+      print("❌ menuUser = NULL (API RESPONSE NOT LOADED!)");
+      print("============================================");
+      return;
+    }
+
+    print("✔ ID: ${menuUser!.id}");
+    print("✔ First Name: ${menuUser!.firstName}");
+    print("✔ Last Name: ${menuUser!.lastName}");
+    print("✔ Full Name: ${menuUser!.printName}");
+    print("✔ Mobile: ${menuUser!.mobile}");
+    print("✔ Email: ${menuUser!.email}");
+    print("✔ DOB Raw: ${menuUser!.dob}");
+    print("✔ Address: ${menuUser!.permanentAddress}");
+    print("✔ Profile Image: ${menuUser!.profileImage}");
+
+    print("=========== END OF MENU USER LOG ===========");
   }
 
   @override
@@ -219,11 +245,11 @@ class _MenuSectionScreenState extends State<MenuSectionScreen>
       padding: const EdgeInsets.all(16),
       child: Column(
         children: [
-          _readonlyField(user?.printName ?? ""), // Full name
-          _readonlyField("+91 ${user?.mobile ?? ""}"), // Mobile
-          _readonlyField(user?.email ?? ""), // Email
-          _readonlyField(user?.dob?.split("T").first ?? ""), // DOB
-          _readonlyField(user?.permanentAddress ?? "Not Available"), // Address
+          _readonlyField(user?.printName ?? ""),
+          _readonlyField("+91 ${user?.mobile ?? ""}"),
+          _readonlyField(user?.email ?? ""),
+          _readonlyField(user?.dob?.split("T").first ?? ""),
+          _readonlyField(user?.permanentAddress ?? "Not Available"),
           const SizedBox(height: 10),
 
           Container(

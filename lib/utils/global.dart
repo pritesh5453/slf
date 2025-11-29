@@ -1,3 +1,5 @@
+// lib/utils/global.dart
 import 'package:slf/model/menuModel.dart';
 
-MenuCustomer? menuUser; // Global drawer user
+MenuCustomer? menuUser;
+String? accessToken;
