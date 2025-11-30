@@ -1,13 +1,24 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:slf/model/homescreen/homescreen_model.dart';
+import 'package:slf/utils/global.dart';
 
 class LoanService {
   Future<LoanDashboardModel?> getDashboardData(String token) async {
     try {
+      // 🔥 Dynamic customerId from logged-in user
+      final customerId = menuUser?.id;
+
+      if (customerId == null) {
+        print("❌ ERROR: menuUser.id is NULL, user not logged in!");
+        return null;
+      }
+
       final url = Uri.parse(
-        "https://slfuatbackend.1on1screen.com/Master/doc/get-customer-loans?customerId=1",
+        "https://slfuatbackend.1on1screen.com/Master/doc/get-customer-loans?customerId=$customerId",
       );
+
+      print("📤 Calling Dashboard API for Customer ID: $customerId");
 
       final response = await http.get(
         url,

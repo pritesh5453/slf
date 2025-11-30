@@ -37,7 +37,7 @@ class _PreApprovedLoansScreenState extends State<PreApprovedLoansScreen> {
 
       body: SafeArea(
         child: FutureBuilder<PreApprovedLoanResponse?>(
-          future: PreApprovedLoanService.getPreApprovedLoans(1),
+          future: PreApprovedLoanService.getPreApprovedLoans(),
           builder: (context, snapshot) {
             if (!snapshot.hasData) {
               return const Center(

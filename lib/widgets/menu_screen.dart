@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:slf/model/menuModel.dart';
 import 'package:slf/utils/global.dart'; // menuUser
 
@@ -11,6 +12,21 @@ class MenuSectionScreen extends StatefulWidget {
 
 class _MenuSectionScreenState extends State<MenuSectionScreen>
     with SingleTickerProviderStateMixin {
+  Future<void> logoutUser(BuildContext context) async {
+    // SharedPreferences instance
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    // Clear all saved data
+    await prefs.clear();
+
+    // Clear global variables
+    menuUser = null;
+    accessToken = null;
+
+    // Navigate to Login Screen
+    Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+  }
+
   String selected = "";
 
   late AnimationController _controller;
@@ -204,19 +220,24 @@ class _MenuSectionScreenState extends State<MenuSectionScreen>
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: 20,
                                   ),
-                                  child: Row(
-                                    children: const [
-                                      Icon(Icons.logout, color: Colors.red),
-                                      SizedBox(width: 10),
-                                      Text(
-                                        "Log Out",
-                                        style: TextStyle(
-                                          color: Colors.red,
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.w600,
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      logoutUser(context);
+                                    },
+                                    child: Row(
+                                      children: const [
+                                        Icon(Icons.logout, color: Colors.red),
+                                        SizedBox(width: 10),
+                                        Text(
+                                          "Log Out",
+                                          style: TextStyle(
+                                            color: Colors.red,
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w600,
+                                          ),
                                         ),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
                                 ),
 
@@ -249,7 +270,13 @@ class _MenuSectionScreenState extends State<MenuSectionScreen>
           _readonlyField("+91 ${user?.mobile ?? ""}"),
           _readonlyField(user?.email ?? ""),
           _readonlyField(user?.dob?.split("T").first ?? ""),
-          _readonlyField(user?.permanentAddress ?? "Not Available"),
+          _readonlyField(
+            "${user?.permanentAddress ?? ""}, "
+            "${user?.permanentCity ?? ""}, "
+            "${user?.permanentState ?? ""}, "
+            "${user?.permanentCountry ?? ""} - "
+            "${user?.permanentPincode ?? ""}",
+          ),
           const SizedBox(height: 10),
 
           Container(

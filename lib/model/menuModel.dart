@@ -38,7 +38,7 @@ class MenuCustomer {
   final String? permanentCity;
   final String? permanentState;
   final String? permanentCountry;
-
+  final String? permanentPincode;
   final String? correspondingAddress;
   final String? correspondingCity;
   final String? correspondingState;
@@ -64,6 +64,7 @@ class MenuCustomer {
     this.correspondingCity,
     this.correspondingState,
     this.correspondingCountry,
+    this.permanentPincode,
   });
 
   factory MenuCustomer.fromJson(Map<String, dynamic> json) {
@@ -89,6 +90,7 @@ class MenuCustomer {
       correspondingCity: json['Corresponding_City'],
       correspondingState: json['Corresponding_State'],
       correspondingCountry: json['Corresponding_Country'],
+      permanentPincode: json['Permanent_Pincode'],
     );
   }
 }

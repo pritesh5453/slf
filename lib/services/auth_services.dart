@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:slf/model/login/login_model.dart';
 import 'package:slf/model/menuModel.dart';
 import 'package:slf/utils/global.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthService {
   Future<LoginResponse?> loginUser(String email, String password) async {
@@ -13,39 +14,37 @@ class AuthService {
 
       final body = {"email": email, "password": password};
 
-      print("📤 Sending Login Request to API...");
-      print("➡ Body: $body");
-
+      print("📤 Sending Login Request...");
       final response = await http.post(
         url,
         headers: {"Content-Type": "application/json"},
         body: jsonEncode(body),
       );
 
-      print("📥 Raw Response: ${response.body}");
+      print("📥 Response: ${response.body}");
 
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(response.body);
 
-        // Convert to LoginResponse model
+        // Convert API response
         final loginResponse = LoginResponse.fromJson(jsonData);
 
-        // -------------------------------------------------------
-        // 🔥 MOST IMPORTANT — SET GLOBAL menuUser FOR DRAWER
-        // -------------------------------------------------------
+        // ---------------------------
+        // 🔥 Set Global Variables
+        // ---------------------------
         if (jsonData["customer"] != null) {
           menuUser = MenuCustomer.fromJson(jsonData["customer"]);
-
-          print("✅ menuUser SET SUCCESSFULLY");
-          print("➡ Name: ${menuUser?.printName}");
-          print("➡ Email: ${menuUser?.email}");
-          print("➡ Mobile: ${menuUser?.mobile}");
-        } else {
-          print("⚠️ Login response me 'customer' object missing hai");
+          accessToken = jsonData["accessToken"];
         }
 
-        // 🔥 Store token globally too (useful)
-        accessToken = jsonData["accessToken"];
+        // ---------------------------
+        // 🔥 Save in SharedPreferences
+        // ---------------------------
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setString("accessToken", accessToken!);
+        await prefs.setString("userData", jsonEncode(jsonData["customer"]));
+
+        print("✅ Login data saved in SharedPreferences");
 
         return loginResponse;
       } else {
