@@ -37,8 +37,9 @@ class LoanDetailsScreen extends StatelessWidget {
     final doubleAmount = double.tryParse(cleanAmount(amount)) ?? 0;
     final doublePaid = double.tryParse(cleanAmount(totalPaid)) ?? 0;
 
-    double progress =
-        doubleAmount > 0 ? (doublePaid / doubleAmount).clamp(0, 1) : 0;
+    double progress = doubleAmount > 0
+        ? (doublePaid / doubleAmount).clamp(0, 1)
+        : 0;
 
     return Scaffold(
       backgroundColor: Colors.white,

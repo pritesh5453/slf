@@ -35,6 +35,7 @@ class _ActiveLoansScreenState extends State<ActiveLoansScreen> {
 
   @override
   Widget build(BuildContext context) {
+    FocusScope.of(context).unfocus();
     final width = MediaQuery.of(context).size.width;
 
     if (loading || data == null) {
