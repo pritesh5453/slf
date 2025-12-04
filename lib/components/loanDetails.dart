@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:slf/components/notification.dart';
 import 'package:slf/model/activeloans.dart';
 
 class LoanDetailsScreen extends StatelessWidget {
@@ -88,11 +89,19 @@ class LoanDetailsScreen extends StatelessWidget {
                       ],
                     ),
                     const Spacer(),
-                    const Icon(
-                      Icons.notifications_none,
-                      color: Colors.white,
-                      size: 26,
-                    ),
+                    GestureDetector(
+                          onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => NotificationsScreen(),
+                            ),
+                          ),
+                          child: const Icon(
+                            Icons.notifications_none,
+                            size: 30,
+                            color: Colors.white,
+                          ),
+                        ),
                   ],
                 ),
               ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:slf/components/loanDetails.dart';
+import 'package:slf/components/notification.dart';
 import 'package:slf/model/activeloans.dart';
 import 'package:slf/services/loan_services.dart';
 import 'package:slf/utils/global.dart';
@@ -100,11 +101,19 @@ class _ActiveLoansScreenState extends State<ActiveLoansScreen> {
                       ],
                     ),
                     const Spacer(),
-                    const Icon(
-                      Icons.notifications_none,
-                      color: Colors.white,
-                      size: 28,
-                    ),
+                    GestureDetector(
+                          onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => NotificationsScreen(),
+                            ),
+                          ),
+                          child: const Icon(
+                            Icons.notifications_none,
+                            size: 30,
+                            color: Colors.white,
+                          ),
+                        ),
                   ],
                 ),
               ),

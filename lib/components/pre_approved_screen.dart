@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:slf/components/notification.dart';
 import 'package:slf/model/PreApprovedLoanmodel.dart';
 import 'package:slf/services/preapproved_services.dart';
 import 'package:slf/utils/global.dart';
@@ -106,10 +107,18 @@ class _PreApprovedLoansScreenState extends State<PreApprovedLoansScreen> {
                         ),
 
                         const Spacer(),
-                        const Icon(
-                          Icons.notifications_none,
-                          color: Colors.white,
-                          size: 28,
+                        GestureDetector(
+                          onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => NotificationsScreen(),
+                            ),
+                          ),
+                          child: const Icon(
+                            Icons.notifications_none,
+                            size: 30,
+                            color: Colors.white,
+                          ),
                         ),
                       ],
                     ),
